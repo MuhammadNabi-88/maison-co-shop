@@ -1,1 +1,46 @@
-<?php require dirname(__DIR__).'/includes/bootstrap.php';admin_required();$err='';if($_SERVER['REQUEST_METHOD']==='POST'){check_csrf();if(($_POST['action']??'')==='hide'){$pdo->prepare('UPDATE products SET is_active=0 WHERE id=?')->execute([(int)$_POST['id']]);notice('Product hidden.');go('admin/products.php');}$name=trim($_POST['name']??'');$desc=trim($_POST['description']??'');$price=(float)($_POST['price']??0);if($name&&$desc&&$price>0){$s=$pdo->prepare('INSERT INTO products(name,description,category,price,stock,image,is_featured) VALUES(?,?,?,?,?,?,?)');$s->execute([$name,$desc,trim($_POST['category']??'Other'),$price,max(0,(int)$_POST['stock']),trim($_POST['image']??''),isset($_POST['featured'])?1:0]);notice('Product created.');go('admin/products.php');}else $err='Enter a name, description and valid price.';}$products=$pdo->query('SELECT * FROM products ORDER BY id DESC')->fetchAll();$pageTitle='Manage products';require dirname(__DIR__).'/includes/header.php';?><section class="page-banner compact"><small class="eyebrow">BACK OFFICE</small><h1>Manage <em>products.</em></h1></section><section class="admin-area"><form method="post" class="auth-card"><?=csrf()?><h2>Add a product</h2><?php if($err):?><p class="error"><?=e($err)?></p><?php endif;?><div class="fields"><label>Name<input name="name" required></label><label>Category<input name="category" value="Home"></label><label>Price (€)<input name="price" type="number" min=".01" step=".01" required></label><label>Stock<input name="stock" type="number" min="0" value="5"></label><label class="wide">Image URL<input name="image" type="url"></label><label class="wide">Description<textarea name="description" required></textarea></label></div><label class="check"><input type="checkbox" name="featured"> Feature on homepage</label><button class="btn dark">Create product ↗</button></form><h2>Product catalogue</h2><?php foreach($products as $p):?><div class="admin-row"><img src="<?=e(image_url($p['image']))?>" alt=""><div><b><?=e($p['name'])?></b><small><?=e($p['category'])?> · <?=money($p['price'])?> · <?=$p['stock']?> in stock · <?=$p['is_active']?'Active':'Hidden'?></small></div><?php if($p['is_active']):?><form method="post"><?=csrf()?><input type="hidden" name="action" value="hide"><input type="hidden" name="id" value="<?=$p['id']?>"><button name="submit" class="remove">×</button></form><?php endif;?></div><?php endforeach;?></section><?php require dirname(__DIR__).'/includes/footer.php';?>
+<?php require dirname(__DIR__) . '/includes/bootstrap.php';
+admin_required();
+$err = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    check_csrf();
+    if (($_POST['action'] ?? '') === 'hide') {
+        $pdo->prepare('UPDATE products SET is_active=0 WHERE id=?')->execute([(int) $_POST['id']]);
+        notice('Product hidden.');
+        go('admin/products.php');
+    }
+    $name = trim($_POST['name'] ?? '');
+    $desc = trim($_POST['description'] ?? '');
+    $price = (float) ($_POST['price'] ?? 0);
+    if ($name && $desc && $price > 0) {
+        $s = $pdo->prepare('INSERT INTO products(name,description,category,price,stock,image,is_featured) VALUES(?,?,?,?,?,?,?)');
+        $s->execute([$name, $desc, trim($_POST['category'] ?? 'Other'), $price, max(0, (int) $_POST['stock']), trim($_POST['image'] ?? ''), isset($_POST['featured']) ? 1 : 0]);
+        notice('Product created.');
+        go('admin/products.php');
+    } else
+        $err = 'Enter a name, description and valid price.';
+}
+$products = $pdo->query('SELECT * FROM products ORDER BY id DESC')->fetchAll();
+$pageTitle = 'Manage products';
+require dirname(__DIR__) . '/includes/header.php'; ?>
+<section class="page-banner compact"><small class="eyebrow">BACK OFFICE</small>
+    <h1>Manage <em>products.</em></h1>
+</section>
+<section class="admin-area">
+    <form method="post" class="auth-card"><?= csrf() ?>
+        <h2>Add a product</h2><?php if ($err): ?>
+            <p class="error"><?= e($err) ?></p><?php endif; ?>
+        <div class="fields"><label>Name<input name="name" required></label><label>Category<input name="category"
+                    value="Home"></label><label>Price (€)<input name="price" type="number" min=".01" step=".01"
+                    required></label><label>Stock<input name="stock" type="number" min="0" value="5"></label><label
+                class="wide">Image URL<input name="image" type="url"></label><label class="wide">Description<textarea
+                    name="description" required></textarea></label></div><label class="check"><input type="checkbox"
+                name="featured"> Feature on homepage</label><button class="btn dark">Create product ↗</button>
+    </form>
+    <h2>Product catalogue</h2><?php foreach ($products as $p): ?>
+        <div class="admin-row"><img src="<?= e(image_url($p['image'])) ?>" alt="">
+            <div><b><?= e($p['name']) ?></b><small><?= e($p['category']) ?> · <?= money($p['price']) ?> · <?= $p['stock'] ?> in
+                    stock · <?= $p['is_active'] ? 'Active' : 'Hidden' ?></small></div><?php if ($p['is_active']): ?>
+                <form method="post"><?= csrf() ?><input type="hidden" name="action" value="hide"><input type="hidden" name="id"
+                        value="<?= $p['id'] ?>"><button name="submit" class="remove">×</button></form><?php endif; ?>
+        </div><?php endforeach; ?>
+</section><?php require dirname(__DIR__) . '/includes/footer.php'; ?>

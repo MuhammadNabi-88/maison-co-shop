@@ -1,1 +1,5 @@
-document.addEventListener('DOMContentLoaded',()=>{const b=document.querySelector('.nav-toggle'),n=document.querySelector('.header nav');if(b&&n)b.addEventListener('click',()=>n.classList.toggle('open'));});
+document.addEventListener("DOMContentLoaded", () => {
+  const b = document.querySelector(".nav-toggle"),
+    n = document.querySelector(".header nav");
+  if (b && n) b.addEventListener("click", () => n.classList.toggle("open"));
+});
