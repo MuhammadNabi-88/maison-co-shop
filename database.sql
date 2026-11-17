@@ -1,9 +1,3 @@
-CREATE DATABASE IF NOT EXISTS maison_shop CHARACTER
-SET
-    utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE maison_shop;
-
 CREATE TABLE
     users (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
